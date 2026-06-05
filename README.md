@@ -27,3 +27,5 @@ The client authentication certificate will be downloaded as a .p12 file. Be sure
 
 # Configure the repository environment
 This is arguably the hardest part because the DigiCert documentation for [Binary Signing with Github Actions](https://docs.digicert.com/en/software-trust-manager/ci-cd-integrations-and-deployment-pipelines/plugins/github/binary-signing-using-github-actions.html#get-started-with-digicert-binary-signing-1194271) is a little murky and has a few errors. But, most of the hard work has already been done and all you need to do at this point is configure variable and secret values.
+
+In your repository, click on *Settings* and then *V
