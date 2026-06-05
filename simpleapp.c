@@ -8,6 +8,8 @@
 // Updated SM_HOST to include https://
 // NOTE: Needed to add CLIENT_CERT_FILE and CLIENT_CERT_FILE_PASSWORD environment variables? No...just make sure you specify ${{env.SM_CLIENT_CERT_FILE}} 
 
+// NOTE: Each GitHub Actions step runs in its own process/shell so you need to export the SM_CLIENT_CERT_FILE value to be used on other steps:
+//           echo "SM_CLIENT_CERT_FILE=${SM_CLIENT_CERT_FILE}" >> "$GITHUB_ENV"
 // Getting an issue with the Client Auth Cert not working.
 
 int main() {
