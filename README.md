@@ -28,4 +28,15 @@ The client authentication certificate will be downloaded as a .p12 file. Be sure
 # Configure the repository environment
 This is arguably the hardest part because the DigiCert documentation for [Binary Signing with Github Actions](https://docs.digicert.com/en/software-trust-manager/ci-cd-integrations-and-deployment-pipelines/plugins/github/binary-signing-using-github-actions.html#get-started-with-digicert-binary-signing-1194271) is a little murky and has a few errors. But, most of the hard work has already been done and all you need to do at this point is configure variable and secret values.
 
-In your repository, click on *Settings* --> *Secrets and Variables* --> *Actions*.
+In your repository, click on *Settings* --> *Secrets and Variables* --> *Actions*. Click on the *Variables* tab and then select the *Add repository variable* button. You will create the following variable:
+
+* SM_HOST: https://clientauth.one.digicert.com (NOTE: Select the host for the [region](https://docs.digicert.com/en/software-trust-manager/get-started/requirements.html#host-environment-367442) you're using)
+
+After saving the variable, now create your secrets by clicking on the *Secrets* tab and creating the following [session-based environment variables](https://docs.digicert.com/en/software-trust-manager/get-started/requirements/secure-credentials/set-up-secure-credentials-for-windows/session-based-environment-variables-for-windows.html#configure-session-based-environment-variables-470095) that you created in the STM portal previously:
+
+* SM_API_KEY: [API_KEY_VALUE]
+* SM_CLIENT_CERT_FILE: [BASE64_ENCODED_P12]
+* SM_CLIENT_CERT_PASSWORD: [PASSWORD_VALUE]
+
+For the SM_CLIENT_CERT_FILE you will need to first base64 encode the contents of the .p12 file. The way this works in the Github hosted-runner Actions is you copy this base64 version of the .p12 file to an environment variable and the runner/job will convert it back to a .p12 to be used by the runner.
+
