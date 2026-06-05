@@ -15,6 +15,10 @@ jobs:
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+      - name: Compile C program
+        run: gcc -o simpleapp simpleapp.c
       - name: Setup SM_CLIENT_CERT_FILE from base64 secret data
         run: |
           export SM_CLIENT_CERT_FILE=${RUNNER_TEMP}/sm_client_cert.p12
@@ -25,7 +29,7 @@ jobs:
         with:
           simple-signing-mode: true
           # If the below 2 parameters are supplied, then smctl executable is invoked to attempt the signing.
-          input: simpleapp.c
+          input: simpleapp
           keypair-alias: TYLER_STATIC_KP
         env:
           SM_HOST: ${{ vars.SM_HOST }}
