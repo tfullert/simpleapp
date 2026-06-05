@@ -20,4 +20,9 @@ Click on *Create Keypair* and make a note of the keypair alias you specified.
 # Configure your factors for authentication
 The tools that Github Actions will use to interact with STM require two-factor authentication. You will need to create an API key and a client authentication certificate. The documentation for [creating these factors](https://docs.digicert.com/en/software-trust-manager/get-started/requirements.html#two-factor-authentication-367442) is straightforward. Create the API key and client authentication certificate for the user you specified during the keypair creation above.
 
+* [Create an API key](https://docs.digicert.com/en/software-trust-manager/get-started/requirements.html#create-an-api-key-367442)
+* [Create a client authentication certificate](https://docs.digicert.com/en/software-trust-manager/get-started/requirements.html#create-a-client-authentication-certificate-367442)
+
+The client authentication certificate will be downloaded as a .p12 file. Be sure to save it and the certificate password as they cannot be downloaded again once you close the modal dialog box.
+
 # Configure the repository environment
