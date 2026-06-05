@@ -38,6 +38,15 @@ jobs:
           -info \
           -noout \
           -passin pass:"${{ secrets.SM_CLIENT_CERT_PASSWORD }}"
+      - name: Inspect client auth certificate metadata
+        shell: bash
+        run: |
+          openssl pkcs12 \
+          -in "$SM_CLIENT_CERT_FILE" \
+          -clcerts \
+          -nokeys \
+          -passin pass:"${{ secrets.SM_CLIENT_CERT_PASSWORD }}" \
+          | openssl x509 -noout -subject -issuer -dates -ext extendedKeyUsage
       - name: Setup Software Trust Manager
         uses: digicert/code-signing-software-trust-action@v1
         with:
