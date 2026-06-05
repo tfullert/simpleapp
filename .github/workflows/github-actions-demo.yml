@@ -48,7 +48,7 @@ jobs:
           -passin pass:"${{ secrets.SM_CLIENT_CERT_PASSWORD }}" \
           | openssl x509 -noout -subject -issuer -dates -ext extendedKeyUsage
       - name: Setup Software Trust Manager
-        uses: digicert/code-signing-software-trust-action@v1
+        uses: digicert/code-signing-software-trust-action@v1.2.0
         with:
           simple-signing-mode: true
           # If the below 2 parameters are supplied, then smctl executable is invoked to attempt the signing.
