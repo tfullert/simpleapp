@@ -6,7 +6,7 @@
 // [Convert]::ToBase64String([IO.File]::ReadAllBytes("C:\path_to_file\Certificate_pkcs12.p12")) | Set-Content -NoNewline -Encoding ascii "C:\path_to_file\Certificate_pkcs12.p12.b64"
 // Make sure YAML file references SM_CLIENT_CERT_FILE properly (using env.SMCLIENT_CERT_FILE): SM_CLIENT_CERT_FILE: ${env.SM_CLIENT_CERT_FILE}
 // Updated SM_HOST to include https://
-// NOTE: Needed to add CLIENT_CERT_FILE and CLIENT_CERT_FILE_PASSWORD environment variables?
+// NOTE: Needed to add CLIENT_CERT_FILE and CLIENT_CERT_FILE_PASSWORD environment variables? No...just make sure you specify ${{env.SM_CLIENT_CERT_FILE}} 
 
 // Getting an issue with the Client Auth Cert not working.
 
