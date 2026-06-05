@@ -45,7 +45,7 @@ For the SM_CLIENT_CERT_FILE you will need to first base64 encode the contents of
 Open that .p12.b64 file and copy the entire text into the SM_CLIENT_CERT_FILE secret.
 
 # Performing Actions
-Now when you commit changes for your repository it should trigger Actions to run. Make a change to a file and click *Commit Changes...* and then click on the *Actions* tab. Give it a minute to run
+Now when you commit changes for your repository it should trigger Actions to run. Make a change to a file and click *Commit Changes...* and then click on the *Actions* tab. Give it a minute to run, it should complete successfully. When it's done, expand the Actions workflow and look for *Setup Software Trust Manager*. Expand that step and you should see 'Signing of "simpleapp.exe" was successful'.
 
 
 
