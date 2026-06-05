@@ -25,8 +25,8 @@ jobs:
         with:
           simple-signing-mode: true
           # If the below 2 parameters are supplied, then smctl executable is invoked to attempt the signing.
-          input: <file or directory with list of supported files to sign>
-          keypair-alias: <a Software Trust Manager keypair to sign with>
+          input: simpleapp.c
+          keypair-alias: TYLER_STATIC_KP
         env:
           SM_HOST: ${{ vars.SM_HOST }}
           SM_API_KEY: ${{ secrets.SM_API_KEY }}
