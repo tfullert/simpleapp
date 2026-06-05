@@ -38,5 +38,7 @@ After saving the variable, now create your secrets by clicking on the *Secrets* 
 * SM_CLIENT_CERT_FILE: [BASE64_ENCODED_P12]
 * SM_CLIENT_CERT_PASSWORD: [PASSWORD_VALUE]
 
-For the SM_CLIENT_CERT_FILE you will need to first base64 encode the contents of the .p12 file. The way this works in the Github hosted-runner Actions is you copy this base64 version of the .p12 file to an environment variable and the runner/job will convert it back to a .p12 to be used by the runner.
+For the SM_CLIENT_CERT_FILE you will need to first base64 encode the contents of the .p12 file. The way this works in the Github hosted-runner Actions is you copy this base64 version of the .p12 file to an environment variable and the runner/job will convert it back to a .p12 to be used by the runner. On Windows you can do this in PowerShell with the following command: 
+
+
 
