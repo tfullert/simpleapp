@@ -40,5 +40,12 @@ After saving the variable, now create your secrets by clicking on the *Secrets* 
 
 For the SM_CLIENT_CERT_FILE you will need to first base64 encode the contents of the .p12 file. The way this works in the Github hosted-runner Actions is you copy this base64 version of the .p12 file to an environment variable and the runner/job will convert it back to a .p12 to be used by the runner. On Windows you can do this in PowerShell with the following command: 
 
+``[Convert]::ToBase64String([IO.File]::ReadAllBytes("C:\path_to_file\name_of_pkcs12_file.p12")) | Set-Content -NoNewline -Encoding ascii "C:\path_to_file\name_of_pkcs12_file.p12.b64"``
+
+Open that .p12.b64 file and copy the entire text into the SM_CLIENT_CERT_FILE secret.
+
+# Performing Actions
+Now when you commit changes for your repository it should trigger Actions to run. Make a change to a file and click *Commit Changes...* and then click on the *Actions* tab. Give it a minute to run
+
 
 
