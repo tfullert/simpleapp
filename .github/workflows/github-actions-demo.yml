@@ -33,7 +33,7 @@ jobs:
           simple-signing-mode: true
           # If the below 2 parameters are supplied, then smctl executable is invoked to attempt the signing.
           input: simpleapp.exe
-          keypair-alias: TYLER_STATIC_KP
+          keypair-alias: stm://TYLER_STATIC_KP
         env:
           SM_HOST: ${{ vars.SM_HOST }}
           SM_API_KEY: ${{ secrets.SM_API_KEY }}
