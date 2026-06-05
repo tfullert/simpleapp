@@ -27,6 +27,17 @@ jobs:
           echo "${{ secrets.SM_CLIENT_CERT_FILE_B64 }}" | base64 --decode > ${SM_CLIENT_CERT_FILE}
           echo "SM_CLIENT_CERT_FILE=${SM_CLIENT_CERT_FILE}" >> "$GITHUB_ENV"
         shell: bash
+      - name: Verify SM client certificate file
+        shell: bash
+        run: |
+          echo "SM_CLIENT_CERT_FILE=$SM_CLIENT_CERT_FILE"
+          test -s "$SM_CLIENT_CERT_FILE"
+          ls -l "$SM_CLIENT_CERT_FILE"
+          openssl pkcs12 \
+          -in "$SM_CLIENT_CERT_FILE" \
+          -info \
+          -noout \
+          -passin pass:"${{ secrets.SM_CLIENT_CERT_PASSWORD }}"
       - name: Setup Software Trust Manager
         uses: digicert/code-signing-software-trust-action@v1
         with:
@@ -38,5 +49,5 @@ jobs:
           SM_HOST: ${{ vars.SM_HOST }}
           SM_API_KEY: ${{ secrets.SM_API_KEY }}
           SM_CLIENT_CERT_FILE: ${env.SM_CLIENT_CERT_FILE}
-          SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD }}
+          SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD }}  
       - run: echo "🍏 This job's status is ${{ job.status }}."
