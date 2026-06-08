@@ -47,5 +47,7 @@ Open that .p12.b64 file and copy the entire text into the SM_CLIENT_CERT_FILE se
 # Performing Actions
 Now when you commit changes for your repository it should trigger Actions to run. Make a change to a file and click *Commit Changes...* and then click on the *Actions* tab. Give it a minute to run, it should complete successfully. When it's done, expand the Actions workflow and look for *Setup Software Trust Manager*. Expand that step and you should see 'Signing of "simpleapp.exe" was successful'.
 
+Documentation for the DigiCert Software Trust Manager code-signing action can be found [here](https://github.com/digicert/code-signing-software-trust-action) and [here](https://docs.digicert.com/en/software-trust-manager/ci-cd-integrations-and-deployment-pipelines/plugins/github.html).
+
 
 
