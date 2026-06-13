@@ -10,6 +10,10 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   VCPKG_FEATURE_FLAGS: dependencygraph
   VCPKG_DEFAULT_TRIPLET: x64-mingw-static
+  SM_HOST: ${{ vars.SM_HOST }}
+  SM_API_KEY: ${{ secrets.SM_API_KEY }}
+  SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
+  SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD }}  
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
