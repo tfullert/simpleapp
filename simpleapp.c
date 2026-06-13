@@ -12,7 +12,6 @@
 //           echo "SM_CLIENT_CERT_FILE=${SM_CLIENT_CERT_FILE}" >> "$GITHUB_ENV"
 // Getting an issue with the Client Auth Cert not working.
 
-
 int main() {
     // Say "Hello" to the world!
     printf("Hello, World!\n");
