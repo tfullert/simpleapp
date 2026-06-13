@@ -114,7 +114,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y osslsigncode
-      - name: Verify Authenticode signature
+      - name: Write STM root CA certificate
         run: |
-          osslsigncode verify -in simpleapp.exe
+          printf '%s\n' "${{ secrets.STM_ROOT_CA_PEM }}" > stm-root-ca.pem
+          openssl x509 -in stm-root-ca.pem -noout -subject -issuer -fingerprint -sha256
+      - name: Verify Authenticode signature with STM root CA
+        run: |
+          osslsigncode verify \
+            -CAfile stm-root-ca.pem \
+            -in simpleapp.exe
       - run: echo "🍏 This job's status is ${{ job.status }}."
