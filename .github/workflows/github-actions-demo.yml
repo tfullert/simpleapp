@@ -40,11 +40,14 @@ jobs:
           echo "VCPKG_ROOT=$VCPKG_ROOT"
           find "$GITHUB_WORKSPACE" -type f -name zlib.h -print
           find "$GITHUB_WORKSPACE" -maxdepth 3 -type d -name "vcpkg_installed" -print
+          VCPKG_INSTALLED_DIR=$(find "$GITHUB_WORKSPACE" -type f -name zlib.h -print -quit | sed 's#/include/zlib.h##')
+          echo "VCPKG_INSTALLED_DIR=$VCPKG_INSTALLED_DIR" >> "$GITHUB_ENV"
+          echo "Found vcpkg installed dir: $VCPKG_INSTALLED_DIR"
       - name: Build Windows test executable
         run: |
           x86_64-w64-mingw32-gcc simpleapp.c \
-            -I"$VCPKG_ROOT/installed/x64-mingw-static/include" \
-            -L"$VCPKG_ROOT/installed/x64-mingw-static/lib" \
+            -I"$VCPKG_INSTALLED_DIR/include" \
+            -L"$VCPKG_INSTALLED_DIR/lib" \
             -lz \
             -o simpleapp.exe
       - name: Setup SM_CLIENT_CERT_FILE from base64 secret data
