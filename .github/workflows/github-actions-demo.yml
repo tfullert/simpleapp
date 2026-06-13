@@ -35,9 +35,11 @@ jobs:
           runVcpkgInstall: true
       - name: Show vcpkg install layout
         run: |
+          echo "PWD=$(pwd)"
+          echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
           echo "VCPKG_ROOT=$VCPKG_ROOT"
-          find "$VCPKG_ROOT/installed" -maxdepth 3 -type f -name zlib.h -print
-          find "$VCPKG_ROOT/installed" -maxdepth 2 -type d -print
+          find "$GITHUB_WORKSPACE" -type f -name zlib.h -print
+          find "$GITHUB_WORKSPACE" -maxdepth 3 -type d -name "vcpkg_installed" -print
       - name: Build Windows test executable
         run: |
           x86_64-w64-mingw32-gcc simpleapp.c \
