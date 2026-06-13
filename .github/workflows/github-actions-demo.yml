@@ -110,17 +110,14 @@ jobs:
           SM_API_KEY: ${{ secrets.SM_API_KEY }}
           SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
           SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD }}
-      #- name: Install signature verification tool
-      #  run: |
-      #    sudo apt-get update
-      #    sudo apt-get install -y osslsigncode
-      #- name: Write STM root CA certificate
-      #  run: |
-      #    printf '%s\n' "${{ secrets.STM_ROOT_CA_PEM }}" > stm-root-ca.pem
-      #    openssl x509 -in stm-root-ca.pem -noout -subject -issuer -fingerprint -sha256
-      #- name: Verify Authenticode signature with STM root (RSA) CA
-      #  run: |
-      #    osslsigncode verify \
-      #      -CAfile stm-root-ca.pem \
-      #      -in simpleapp.exe
+      - name: Install signature verification tool
+        if: ${{ vars.PERFORM_VALIDATION == 'true' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y osslsigncode
+          printf '%s\n' "${{ secrets.STM_ROOT_CA_PEM }}" > stm-root-ca.pem
+          openssl x509 -in stm-root-ca.pem -noout -subject -issuer -fingerprint -sha256
+          osslsigncode verify \
+            -CAfile stm-root-ca.pem \
+            -in simpleapp.exe
       - run: echo "🍏 This job's status is ${{ job.status }}."
