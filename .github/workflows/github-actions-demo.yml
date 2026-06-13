@@ -91,14 +91,14 @@ jobs:
           SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
           SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD }}  
         
-      - name: Scan source code with Software Trust Manager
-        run: |
-          smctl scan fossa-scan --input  ${{ github.workspace }} --project Simple_App_Project --scan-alias Simple_App_Scan
-        env:
-          SM_HOST: ${{ vars.SM_HOST }}
-          SM_API_KEY: ${{ secrets.SM_API_KEY }}
-          SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
-          SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD }}
+      #- name: Scan source code with Software Trust Manager
+      #  run: |
+      #    smctl scan fossa-scan --input  ${{ github.workspace }} --project Simple_App_Project --scan-alias Simple_App_Scan
+      #  env:
+      #    SM_HOST: ${{ vars.SM_HOST }}
+      #    SM_API_KEY: ${{ secrets.SM_API_KEY }}
+      #    SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
+      #    SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD }}
       - name: Sign simpleapp.exe
         uses: digicert/code-signing-software-trust-action@v1.2.0
         with:
