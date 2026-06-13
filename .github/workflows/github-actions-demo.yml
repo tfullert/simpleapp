@@ -118,7 +118,7 @@ jobs:
         run: |
           printf '%s\n' "${{ secrets.STM_ROOT_CA_PEM }}" > stm-root-ca.pem
           openssl x509 -in stm-root-ca.pem -noout -subject -issuer -fingerprint -sha256
-      - name: Verify Authenticode signature with STM root CA
+      - name: Verify Authenticode signature with STM root (RSA) CA
         run: |
           osslsigncode verify \
             -CAfile stm-root-ca.pem \
