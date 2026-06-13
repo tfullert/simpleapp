@@ -33,6 +33,11 @@ jobs:
         with:
           vcpkgGitCommitId: "f7423ee180c4b7f40d43402c2feb3859161ef625"
           runVcpkgInstall: true
+      - name: Show vcpkg install layout
+        run: |
+          echo "VCPKG_ROOT=$VCPKG_ROOT"
+          find "$VCPKG_ROOT/installed" -maxdepth 3 -type f -name zlib.h -print
+          find "$VCPKG_ROOT/installed" -maxdepth 2 -type d -print
       - name: Build Windows test executable
         run: |
           x86_64-w64-mingw32-gcc simpleapp.c \
