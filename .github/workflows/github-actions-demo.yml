@@ -100,7 +100,7 @@ jobs:
           SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
           SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD }}
       - name: Sign simpleapp.exe
-        uses: digicert/code-signing-software-trust-action@1.2.0
+        uses: digicert/code-signing-software-trust-action@v1.2.0
         with:
           simple-signing-mode: true
           input: simpleapp.exe
