@@ -50,7 +50,7 @@ jobs:
           x86_64-w64-mingw32-gcc simpleapp.c \
             -I"$VCPKG_INSTALLED_DIR/include" \
             -L"$VCPKG_INSTALLED_DIR/lib" \
-            -lz \
+            -l:libzlib.a \
             -o simpleapp.exe
       - name: Setup SM_CLIENT_CERT_FILE from base64 secret data
         run: |
