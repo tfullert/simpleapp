@@ -31,6 +31,7 @@ jobs:
       - name: Set up vcpkg and install dependencies
         uses: lukka/run-vcpkg@v11
         with:
+          vcpkgGitCommitId: "f7423ee180c4b7f40d43402c2feb3859161ef625"
           runVcpkgInstall: true
       - name: Build Windows test executable
         run: |
