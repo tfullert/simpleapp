@@ -110,12 +110,11 @@ jobs:
           SM_API_KEY: ${{ secrets.SM_API_KEY }}
           SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
           SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD }}
-      - name: Verify simpleapp.exe signature
+      - name: Install signature verification tool
         run: |
-          smctl sign verify --fingerprint 0e646b9edee3143f693c6d1fce6e62975478e8ab --input simpleapp.exe
-        env:
-          SM_HOST: ${{ vars.SM_HOST }}
-          SM_API_KEY: ${{ secrets.SM_API_KEY }}
-          SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
-          SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD }}
+          sudo apt-get update
+          sudo apt-get install -y osslsigncode
+      - name: Verify Authenticode signature
+        run: |
+          osslsigncode verify -in simpleapp.exe
       - run: echo "🍏 This job's status is ${{ job.status }}."
