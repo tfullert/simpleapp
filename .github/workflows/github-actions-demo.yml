@@ -110,4 +110,7 @@ jobs:
           SM_API_KEY: ${{ secrets.SM_API_KEY }}
           SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
           SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD }}
+      - name: Verify simpleapp.exe signature
+        run: |
+          smctl sign verify --fingerprint 0e646b9edee3143f693c6d1fce6e62975478e8ab --input simpleapp.exe
       - run: echo "🍏 This job's status is ${{ job.status }}."
