@@ -43,6 +43,8 @@ jobs:
           VCPKG_INSTALLED_DIR=$(find "$GITHUB_WORKSPACE" -type f -name zlib.h -print -quit | sed 's#/include/zlib.h##')
           echo "VCPKG_INSTALLED_DIR=$VCPKG_INSTALLED_DIR" >> "$GITHUB_ENV"
           echo "Found vcpkg installed dir: $VCPKG_INSTALLED_DIR"
+          echo "VCPKG_INSTALLED_DIR=$VCPKG_INSTALLED_DIR"
+          find "$VCPKG_INSTALLED_DIR/lib" -maxdepth 1 -type f -print
       - name: Build Windows test executable
         run: |
           x86_64-w64-mingw32-gcc simpleapp.c \
