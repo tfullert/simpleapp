@@ -111,9 +111,26 @@ jobs:
           SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
           SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD }}
       - name: Install signature verification tool
-        if: ${{ vars.PERFORM_VALIDATION == 'true' }}
+        #if: ${{ vars.PERFORM_VALIDATION == 'true' }}
         run: |
           sudo apt-get update
           sudo apt-get install -y osslsigncode
           osslsigncode verify -in simpleapp.exe
+      - name: Write STM CA certificate files
+        run: |
+          printf '%s\n' "${{ secrets.STM_ROOT_CA_PEM }}" > stm-root-ca.pem
+          printf '%s\n' "${{ secrets.STM_ICA_CA_PEM }}" > stm-ica-ca.pem
+          printf '%s\n' "${{ secrets.STM_LEAF_CA_PEM }}" > stm-leaf-ca.pem
+
+          openssl x509 -in stm-root-ca.pem -noout -subject -issuer -fingerprint -sha256
+          openssl x509 -in stm-ica-ca.pem -noout -subject -issuer -fingerprint -sha256
+          openssl x509 -in stm-leaf-ca.pem -noout -subject -issuer -fingerprint -sha256
+      - name: Build STM CA bundle
+        run: |
+          cat stm-root-ca.pem stm-ica-ca.pem stm-leaf-ca.pem > stm-ca-bundle.pem
+      - name: Verify signed EXE
+        run: |
+          osslsigncode verify \
+            -CAfile stm-ca-bundle.pem \
+            -in simpleapp.exe
       - run: echo "🍏 This job's status is ${{ job.status }}."
