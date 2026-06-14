@@ -14,6 +14,7 @@
 //           echo "SM_CLIENT_CERT_FILE=${SM_CLIENT_CERT_FILE}" >> "$GITHUB_ENV"
 
 // Let's trigger another signature (which should fail because we used the only signature allotted to us).
+// Update to simpleapp.c will trigger another GHA workflow and signing. Because our signing limit is 1 the GHA workflow should fail.
 
 int main() {
     // Say "Hello" to the world!
