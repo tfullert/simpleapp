@@ -79,6 +79,7 @@ jobs:
           -passin pass:"${{ secrets.SM_CLIENT_CERT_PASSWORD }}" \
           | openssl x509 -noout -subject -issuer -dates -ext extendedKeyUsage
       - name: Sign simpleapp.exe with Software Trust Manager
+        # It's easy to add STM signing to your current GHA workflow
         uses: digicert/code-signing-software-trust-action@v1.2.0
         with:
           simple-signing-mode: true
