@@ -78,28 +78,19 @@ jobs:
           -nokeys \
           -passin pass:"${{ secrets.SM_CLIENT_CERT_PASSWORD }}" \
           | openssl x509 -noout -subject -issuer -dates -ext extendedKeyUsage
-      - name: Setup Software Trust Manager
-        uses: digicert/code-signing-software-trust-action@v1.2.0
-        with:
-          simple-signing-mode: true
+      #- name: Setup Software Trust Manager
+      #  uses: digicert/code-signing-software-trust-action@v1.2.0
+      #  with:
+      #    simple-signing-mode: true
           # If the below 2 parameters are supplied, then smctl executable is invoked to attempt the signing.
           #input: simpleapp.exe
           #keypair-alias: TYLER_STATIC_KP
-        env:
-          SM_HOST: ${{ vars.SM_HOST }}
-          SM_API_KEY: ${{ secrets.SM_API_KEY }}
-          SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
-          SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD }}  
-        
-      #- name: Scan source code with Software Trust Manager
-      #  run: |
-      #    smctl scan fossa-scan --input  ${{ github.workspace }} --project Simple_App_Project --scan-alias Simple_App_Scan
-      #  env:
-      #    SM_HOST: ${{ vars.SM_HOST }}
-      #    SM_API_KEY: ${{ secrets.SM_API_KEY }}
-      #    SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
-      #    SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD }}
-      - name: Sign simpleapp.exe
+        #env:
+        #  SM_HOST: ${{ vars.SM_HOST }}
+        #  SM_API_KEY: ${{ secrets.SM_API_KEY }}
+        #  SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
+        #  SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD }}  
+      - name: Sign simpleapp.exe with Software Trust Manager
         uses: digicert/code-signing-software-trust-action@v1.2.0
         with:
           simple-signing-mode: true
@@ -110,18 +101,16 @@ jobs:
           SM_API_KEY: ${{ secrets.SM_API_KEY }}
           SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
           SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD }}
-      - name: Install signature verification tool
+      - name: Install signature verification tool and build cert store
         #if: ${{ vars.PERFORM_VALIDATION == 'true' }}
         run: |
           sudo apt-get update
           sudo apt-get install -y osslsigncode
-        #  osslsigncode verify -in simpleapp.exe
-      - name: Write STM CA certificate files
-        run: |
+          
           printf '%s\n' "${{ secrets.STM_ROOT_CA_PEM }}" > stm-root-ca.pem
           printf '%s\n' "${{ secrets.STM_ICA_CA_PEM }}" > stm-ica-ca.pem
           printf '%s\n' "${{ secrets.STM_LEAF_CA_PEM }}" > stm-leaf-ca.pem
-
+          
           openssl x509 -in stm-root-ca.pem -noout -subject -issuer -fingerprint -sha256
           openssl x509 -in stm-ica-ca.pem -noout -subject -issuer -fingerprint -sha256
           openssl x509 -in stm-leaf-ca.pem -noout -subject -issuer -fingerprint -sha256
