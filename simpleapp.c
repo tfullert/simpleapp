@@ -13,6 +13,8 @@
 // NOTE: Each GitHub Actions step runs in its own process/shell so you need to export the SM_CLIENT_CERT_FILE value to be used on other steps:
 //           echo "SM_CLIENT_CERT_FILE=${SM_CLIENT_CERT_FILE}" >> "$GITHUB_ENV"
 
+// Let's trigger another signature (which should fail because we used the only signature allotted to us).
+
 int main() {
     // Say "Hello" to the world!
     printf("Hello, World!\n");
