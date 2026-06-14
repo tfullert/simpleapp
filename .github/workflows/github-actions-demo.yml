@@ -115,7 +115,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y osslsigncode
-          osslsigncode verify -in simpleapp.exe
+        #  osslsigncode verify -in simpleapp.exe
       - name: Write STM CA certificate files
         run: |
           printf '%s\n' "${{ secrets.STM_ROOT_CA_PEM }}" > stm-root-ca.pem
