@@ -128,6 +128,13 @@ jobs:
       - name: Build STM CA bundle
         run: |
           cat stm-root-ca.pem stm-ica-ca.pem stm-leaf-ca.pem > stm-ca-bundle.pem
+      - name: Inspect STM CA PEM files
+        run: |
+          echo "=== Root CA ==="
+          openssl x509 -in stm-root-ca.pem -noout -subject -issuer -serial -fingerprint -sha256
+
+          echo "=== ICA CA ==="
+          openssl x509 -in stm-ica-ca.pem -noout -subject -issuer -serial -fingerprint -sha256
       - name: Verify signed EXE
         run: |
           osslsigncode verify \
