@@ -104,7 +104,7 @@ jobs:
         with:
           simple-signing-mode: true
           input: simpleapp.exe
-          keypair-alias: Simple_App_Dev_Keypair
+          keypair-alias: Simple_App_Prod_Keypair
       #    keypair-alias: TYLER_STATIC_KP
         env:
           SM_HOST: ${{ vars.SM_HOST }}
@@ -116,9 +116,5 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y osslsigncode
-          printf '%s\n' "${{ secrets.STM_ROOT_CA_PEM }}" > stm-root-ca.pem
-          openssl x509 -in stm-root-ca.pem -noout -subject -issuer -fingerprint -sha256
-          osslsigncode verify \
-            -CAfile stm-root-ca.pem \
-            -in simpleapp.exe
+          osslsigncode verify -in simpleapp.exe
       - run: echo "🍏 This job's status is ${{ job.status }}."
