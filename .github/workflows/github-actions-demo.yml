@@ -10,7 +10,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   VCPKG_FEATURE_FLAGS: dependencygraph
   VCPKG_DEFAULT_TRIPLET: x64-mingw-static
-  DEBUG: 'false'
+  DEBUG: 'true'
   RESTRICT_SUFFIX: ${{ vars.RESTRICT && '_RESTRICT' || '' }}
 jobs:
   Explore-GitHub-Actions:
