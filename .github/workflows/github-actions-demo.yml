@@ -11,6 +11,7 @@ env:
   VCPKG_FEATURE_FLAGS: dependencygraph
   VCPKG_DEFAULT_TRIPLET: x64-mingw-static
   DEBUG: 'false'
+  RESTRICT_SUFFIX: ${{ vars.RESTRICT && '_RESTRICT' || '' }}
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
@@ -71,7 +72,8 @@ jobs:
           -in "$SM_CLIENT_CERT_FILE" \
           -info \
           -noout \
-          -passin pass:"${{ secrets.SM_CLIENT_CERT_PASSWORD }}"
+          -passin pass:"${{ secrets[format('SM_CLIENT_CERT_PASSWORD{0}', env.SECRET_SUFFIX)] }}"
+        # -passin pass:"${{ secrets.SM_CLIENT_CERT_PASSWORD }}"
       - name: Inspect client auth certificate metadata
         # DEBUG
         if: ${{ env.DEBUG == 'true' }}
