@@ -35,8 +35,6 @@ jobs:
           vcpkgGitCommitId: "f7423ee180c4b7f40d43402c2feb3859161ef625"
           runVcpkgInstall: true
       - name: Show vcpkg install layout
-        # DEBUG
-        if: ${{ env.DEBUG == 'true' }}
         run: |
           echo "PWD=$(pwd)"
           echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
