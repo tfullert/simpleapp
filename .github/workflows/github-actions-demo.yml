@@ -10,6 +10,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   VCPKG_FEATURE_FLAGS: dependencygraph
   VCPKG_DEFAULT_TRIPLET: x64-mingw-static
+  DEBUG: 'true'
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
@@ -34,6 +35,8 @@ jobs:
           vcpkgGitCommitId: "f7423ee180c4b7f40d43402c2feb3859161ef625"
           runVcpkgInstall: true
       - name: Show vcpkg install layout
+        # DEBUG
+        if: ${{ env.DEBUG == 'true' }}
         run: |
           echo "PWD=$(pwd)"
           echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
@@ -59,6 +62,8 @@ jobs:
           echo "SM_CLIENT_CERT_FILE=${SM_CLIENT_CERT_FILE}" >> "$GITHUB_ENV"
         shell: bash
       - name: Verify SM client certificate file
+        # DEBUG
+        if: ${{ env.DEBUG == 'true' }}
         shell: bash
         run: |
           echo "SM_CLIENT_CERT_FILE=$SM_CLIENT_CERT_FILE"
@@ -70,6 +75,8 @@ jobs:
           -noout \
           -passin pass:"${{ secrets.SM_CLIENT_CERT_PASSWORD }}"
       - name: Inspect client auth certificate metadata
+        # DEBUG
+        if: ${{ env.DEBUG == 'true' }}
         shell: bash
         run: |
           openssl pkcs12 \
@@ -106,6 +113,8 @@ jobs:
         run: |
           cat stm-root-ca.pem stm-ica-ca.pem stm-leaf-ca.pem > stm-ca-bundle.pem
       - name: Inspect STM CA PEM files
+        # DEBUG
+        if: ${{ env.DEBUG == 'true' }}
         run: |
           echo "=== Root CA ==="
           openssl x509 -in stm-root-ca.pem -noout -subject -issuer -serial -fingerprint -sha256
