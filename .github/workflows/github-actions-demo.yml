@@ -81,9 +81,15 @@ jobs:
           SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
           SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD_DEV }}
         run: |
+          $startTime = Get-Date -Format "dd-MMMM-yyyyTHH:mm"
+          Write-Host $startTime
+
+          $endTime = (Get-Date).AddMinutes(15).ToString("dd-MMMM-yyyyTHH:mm")
+          Write-Host $endTime
+          
           smctl release create offline HS_Project_Release_V5 `
-            18-June-2026T11:45 `
-            18-June-2026T12:00 `
+            $startTime `
+            $endTime `
             3b7597da-f7fc-42d8-a094-fd8c4b1197c4 `
             --project HS_Project `
             --team-id e75fe41c-b620-4f43-b344-3e91fc1cdb8d `
