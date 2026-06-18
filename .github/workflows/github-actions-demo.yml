@@ -98,6 +98,19 @@ jobs:
             --keypair-type STANDARD `
             --release-users ba928ed4-2e3f-42af-9ac0-f2a0893f75f8
 
+            $output | ForEach-Object { Write-Host $_ }
+
+            $releaseId = ($output | Select-String -Pattern '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}' | Select-Object -First 1).Matches.Value
+
+            if (-not $releaseId) {
+              throw "Could not find release ID in smctl release create output."
+            }
+
+            "RELEASE_ID=$releaseId" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+            "RELEASE_NAME=$releaseName" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+            Write-Host "Created release: $releaseName"
+            Write-Host "Release ID: $releaseId"
       - name: Sign simpleapp.exe with Software Trust Manager
         shell: pwsh
         env:
@@ -137,6 +150,22 @@ jobs:
         run: |
           Get-AuthenticodeSignature -FilePath "${{ github.workspace }}\simpleapp.exe" | Format-List *
 
+      - name: Close STM release
+        if: always()
+        shell: pwsh
+        env:
+          SM_HOST: ${{ vars.SM_HOST }}
+          SM_API_KEY: ${{ secrets.SM_API_KEY_DEV }}
+          SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
+          SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD_DEV }}
+        run: |
+          if (-not $env:RELEASE_ID) {
+            Write-Host "No RELEASE_ID found. Skipping release close."
+            exit 0
+          }
+
+          smctl release close $env:RELEASE_ID
+          Write-Host "Closed release: $env:RELEASE_ID"
       - name: Show job status
         shell: pwsh
         run: |
