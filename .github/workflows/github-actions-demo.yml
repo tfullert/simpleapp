@@ -33,7 +33,6 @@ jobs:
         run: |
           Get-ChildItem -Path "${{ github.workspace }}" -Recurse
 
-      # Option A: Build with Microsoft C/C++ compiler on the Windows runner.
       - name: Set up MSVC developer command prompt
         uses: ilammy/msvc-dev-cmd@v1
 
@@ -73,6 +72,9 @@ jobs:
           smctl --help
           smctl healthcheck
 
+      # =====================================================================================
+      # We're using protected (offline) keypairs that require a release window to use.
+      # =====================================================================================
       - name: Create offline release
         shell: pwsh
         env:
@@ -118,6 +120,10 @@ jobs:
 
             Write-Host "Created release: $releaseName"
             Write-Host "Release ID: $releaseId"
+
+      # =====================================================================================
+      # STM will sign our executable.
+      # =====================================================================================
       - name: Sign simpleapp.exe with Software Trust Manager
         shell: pwsh
         env:
@@ -143,7 +149,6 @@ jobs:
           ${{ secrets.STM_LEAF_CA_PEM }}
           "@ | Out-File -FilePath stm-leaf-ca.pem -Encoding ascii
 
-      # Optionally inspect certs if OpenSSL is available on the Windows runner.
       - name: Inspect STM CA PEM files
         shell: pwsh
         run: |
@@ -151,12 +156,14 @@ jobs:
           openssl x509 -in stm-ica-ca.pem -noout -subject -issuer -fingerprint -sha256
           openssl x509 -in stm-leaf-ca.pem -noout -subject -issuer -fingerprint -sha256
 
-      # Windows-native verification path.
       - name: Verify signed EXE
         shell: pwsh
         run: |
           Get-AuthenticodeSignature -FilePath "${{ github.workspace }}\simpleapp.exe" | Format-List *
 
+      # =====================================================================================
+      # Now we can close our release window.
+      # =====================================================================================
       - name: Close STM release
         if: always()
         shell: pwsh
