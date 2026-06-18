@@ -72,17 +72,17 @@ jobs:
           -info \
           -noout \
           -passin pass:"${{ secrets.SM_CLIENT_CERT_PASSWORD_DEV }}"
-      - name: Inspect client auth certificate metadata
+      #- name: Inspect client auth certificate metadata
         # DEBUG
-        if: ${{ env.DEBUG == 'true' }}
-        shell: bash
-        run: |
-          openssl pkcs12 \
-          -in "$SM_CLIENT_CERT_FILE" \
-          -clcerts \
-          -nokeys \
-          -passin pass:"${{ secrets.SM_CLIENT_CERT_PASSWORD_DEV }}" \
-          | openssl x509 -noout -subject -issuer -dates -ext extendedKeyUsage
+      #  if: ${{ env.DEBUG == 'true' }}
+      #  shell: bash
+      #  run: |
+      #    openssl pkcs12 \
+      #    -in "$SM_CLIENT_CERT_FILE" \
+      #    -clcerts \
+      #    -nokeys \
+      #    -passin pass:"${{ secrets.SM_CLIENT_CERT_PASSWORD_DEV }}" \
+      #    | openssl x509 -noout -subject -issuer -dates -ext extendedKeyUsage
       - name: Sign simpleapp.exe with Software Trust Manager
         # It's easy to add STM signing to your current GHA workflow
         uses: digicert/code-signing-software-trust-action@v1.2.0
