@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <zlib.h>
+//#include <zlib.h>
 
 // This code will be updated to trigger Actions
 
@@ -18,6 +18,6 @@
 int main() {
     // Say "Hello" to the world!
     printf("Hello, World!\n");
-    printf("zlib version: %s\n", zlibVersion());
+    //printf("zlib version: %s\n", zlibVersion());
     return 0;
 }
