@@ -52,7 +52,6 @@ jobs:
           "SM_CLIENT_CERT_FILE=$certPath" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
           Write-Host "SM_CLIENT_CERT_FILE=$certPath"
 
-      # Recommended: let DigiCert's GitHub Action install/configure STM client tools.
       - name: Install STM client tools
         uses: digicert/code-signing-software-trust-action@v1.2.0
         env:
