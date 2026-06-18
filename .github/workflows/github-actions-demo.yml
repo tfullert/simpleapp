@@ -90,6 +90,7 @@ jobs:
           mkdir -p ~/digicert-stm
           cd ~/digicert-stm
           curl -Lo smctl https://pki-downloads.digicert.com/stm/latest/smtools-linux-x64.tar.gz
+          ls -lart
           tar -xvf smtools-linux-x64.tar.gz
 
           chmod +x ./smctl 2>/dev/null || true
