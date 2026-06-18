@@ -81,13 +81,15 @@ jobs:
           SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
           SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD_DEV }}
         run: |
+          $releaseName = "HS_Project_Release_${{ github.run_number }}"
+          
           $startTime = Get-Date -Format "dd-MMMM-yyyyTHH:mm"
           Write-Host $startTime
 
           $endTime = (Get-Date).AddMinutes(15).ToString("dd-MMMM-yyyyTHH:mm")
           Write-Host $endTime
           
-          smctl release create offline HS_Project_Release_V5 `
+          $output = & smctl release create offline $releaseName `
             $startTime `
             $endTime `
             3b7597da-f7fc-42d8-a094-fd8c4b1197c4 `
@@ -96,15 +98,20 @@ jobs:
             --purpose SIGN `
             --maxsignatures 10 `
             --keypair-type STANDARD `
-            --release-users ba928ed4-2e3f-42af-9ac0-f2a0893f75f8
+            --release-users ba928ed4-2e3f-42af-9ac0-f2a0893f75f8 `
+             2>&1
 
-            $output | ForEach-Object { Write-Host $_ }
+            $outputText = $output | Out-String
+            Write-Host "SMCTL output:"
+            Write-Host $outputText
 
-            $releaseId = ($output | Select-String -Pattern '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}' | Select-Object -First 1).Matches.Value
+            $releaseIdMatch = [regex]::Match($outputText, '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}')
 
-            if (-not $releaseId) {
+            if (-not $releaseIdMatch.Success) {
               throw "Could not find release ID in smctl release create output."
             }
+
+            $releaseId = $releaseIdMatch.Value
 
             "RELEASE_ID=$releaseId" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
             "RELEASE_NAME=$releaseName" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
