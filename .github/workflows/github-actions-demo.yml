@@ -1,122 +1,137 @@
 name: GitHub Actions Demo
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
-on: 
+
+run-name: ${{ github.actor }} is testing out GitHub Actions
+
+on:
   push:
     branches:
       - main
+
 permissions:
   contents: write
+
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  VCPKG_FEATURE_FLAGS: dependencygraph
-  VCPKG_DEFAULT_TRIPLET: x64-mingw-static
-  DEBUG: 'true'
+
 jobs:
   Explore-GitHub-Actions:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
+
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - name: Show workflow context
+        shell: pwsh
+        run: |
+          Write-Host "The job was automatically triggered by a $env:GITHUB_EVENT_NAME event."
+          Write-Host "This job is now running on a $env:RUNNER_OS server hosted by GitHub."
+          Write-Host "The name of your branch is $env:GITHUB_REF and your repository is $env:GITHUB_REPOSITORY."
+
       - name: Check out repository code
         uses: actions/checkout@v6
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
+
       - name: List files in the repository
+        shell: pwsh
         run: |
-          ls ${{ github.workspace }}
-      - name: Checkout repository code
-        uses: actions/checkout@v6
-      - name: Install MinGW
-        run: sudo apt-get update && sudo apt-get install -y mingw-w64
+          Get-ChildItem -Path "${{ github.workspace }}" -Recurse
+
+      # Option A: Build with Microsoft C/C++ compiler on the Windows runner.
+      - name: Set up MSVC developer command prompt
+        uses: ilammy/msvc-dev-cmd@v1
+
       - name: Build Windows test executable
+        shell: cmd
         run: |
-          x86_64-w64-mingw32-gcc simpleapp.c -o simpleapp.exe
+          cl simpleapp.c /Fe:simpleapp.exe
+
       - name: Setup SM_CLIENT_CERT_FILE from base64 secret data
+        shell: pwsh
         run: |
-          export SM_CLIENT_CERT_FILE=${RUNNER_TEMP}/sm_client_cert.p12
-          echo "${{ secrets.SM_CLIENT_CERT_FILE_DEV_B64 }}" | base64 --decode > ${SM_CLIENT_CERT_FILE}
-          echo "SM_CLIENT_CERT_FILE=${SM_CLIENT_CERT_FILE}" >> "$GITHUB_ENV"
-        shell: bash
-      #- name: Verify SM client certificate file
-        # DEBUG
-      #  if: ${{ env.DEBUG == 'true' }}
-      #  shell: bash
-      #  run: |
-      #    echo "SM_CLIENT_CERT_FILE=$SM_CLIENT_CERT_FILE"
-      #    test -s "$SM_CLIENT_CERT_FILE"
-      #    ls -l "$SM_CLIENT_CERT_FILE"
-      #    openssl pkcs12 \
-      #    -in "$SM_CLIENT_CERT_FILE" \
-      #    -info \
-      #    -noout \
-      #    -passin pass:"${{ secrets.SM_CLIENT_CERT_PASSWORD_DEV }}"
-      #- name: Inspect client auth certificate metadata
-        # DEBUG
-      #  if: ${{ env.DEBUG == 'true' }}
-      #  shell: bash
-      #  run: |
-      #    openssl pkcs12 \
-      #    -in "$SM_CLIENT_CERT_FILE" \
-      #    -clcerts \
-      #    -nokeys \
-      #    -passin pass:"${{ secrets.SM_CLIENT_CERT_PASSWORD_DEV }}" \
-      #    | openssl x509 -noout -subject -issuer -dates -ext extendedKeyUsage
-      - name: Sign simpleapp.exe with Software Trust Manager
-        # It's easy to add STM signing to your current GHA workflow
-        #uses: digicert/code-signing-software-trust-action@v1.2.0
-        run: |
-          mkdir -p ~/digicert-stm
-          cd ~/digicert-stm
-          curl -Lo smctl https://pki-downloads.digicert.com/stm/latest/smtools-linux-x64.tar.gz
-          ls -lart
-          tar -xvf smtools-linux-x64.tar.gz
+          $certPath = Join-Path $env:RUNNER_TEMP "sm_client_cert.p12"
+          [System.IO.File]::WriteAllBytes(
+            $certPath,
+            [System.Convert]::FromBase64String("${{ secrets.SM_CLIENT_CERT_FILE_DEV_B64 }}")
+          )
+          "SM_CLIENT_CERT_FILE=$certPath" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          Write-Host "SM_CLIENT_CERT_FILE=$certPath"
 
-          chmod +x ./smctl 2>/dev/null || true
-          find . -type f -name "smctl*" -exec chmod +x {} \;
-          ./smctl --help
-
-          
-          smctl release create offline HS_Project_Release_V5 18-June-2026T11:45 18-June-2026T12:00 3b7597da-f7fc-42d8-a094-fd8c4b1197c4 \
-            --project HS_Project --team-id e75fe41c-b620-4f43-b344-3e91fc1cdb8d --purpose SIGN --maxsignatures 10 --keypair-type STANDARD \
-            --release-users ba928ed4-2e3f-42af-9ac0-f2a0893f75f8
-          smctl sign --keypair-alias HS_ECDSA384_KP --input ./simpleapp.exe
-        #with:
-        #  simple-signing-mode: true
-        #  input: simpleapp.exe
-        #  keypair-alias: HS_ECDSA384_KP
+      # Recommended: let DigiCert's GitHub Action install/configure STM client tools.
+      - name: Install STM client tools
+        uses: digicert/code-signing-software-trust-action@v1.2.0
         env:
           SM_HOST: ${{ vars.SM_HOST }}
           SM_API_KEY: ${{ secrets.SM_API_KEY_DEV }}
           SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
           SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD_DEV }}
-      - name: Install signature verification tool and build cert store
+
+      - name: Confirm SMCTL is available
+        shell: pwsh
+        env:
+          SM_HOST: ${{ vars.SM_HOST }}
+          SM_API_KEY: ${{ secrets.SM_API_KEY_DEV }}
+          SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
+          SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD_DEV }}
         run: |
-          sudo apt-get update
-          sudo apt-get install -y osslsigncode
-          
-          printf '%s\n' "${{ secrets.STM_ROOT_CA_PEM }}" > stm-root-ca.pem
-          printf '%s\n' "${{ secrets.STM_ICA_CA_PEM }}" > stm-ica-ca.pem
-          printf '%s\n' "${{ secrets.STM_LEAF_CA_PEM }}" > stm-leaf-ca.pem
-          
+          smctl --help
+          smctl healthcheck
+
+      - name: Create offline release
+        shell: pwsh
+        env:
+          SM_HOST: ${{ vars.SM_HOST }}
+          SM_API_KEY: ${{ secrets.SM_API_KEY_DEV }}
+          SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
+          SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD_DEV }}
+        run: |
+          smctl release create offline HS_Project_Release_V5 `
+            18-June-2026T11:45 `
+            18-June-2026T12:00 `
+            3b7597da-f7fc-42d8-a094-fd8c4b1197c4 `
+            --project HS_Project `
+            --team-id e75fe41c-b620-4f43-b344-3e91fc1cdb8d `
+            --purpose SIGN `
+            --maxsignatures 10 `
+            --keypair-type STANDARD `
+            --release-users ba928ed4-2e3f-42af-9ac0-f2a0893f75f8
+
+      - name: Sign simpleapp.exe with Software Trust Manager
+        shell: pwsh
+        env:
+          SM_HOST: ${{ vars.SM_HOST }}
+          SM_API_KEY: ${{ secrets.SM_API_KEY_DEV }}
+          SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
+          SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD_DEV }}
+        run: |
+          smctl sign --keypair-alias HS_ECDSA384_KP --input "${{ github.workspace }}\simpleapp.exe"
+
+      - name: Write STM CA certificates
+        shell: pwsh
+        run: |
+          @"
+          ${{ secrets.STM_ROOT_CA_PEM }}
+          "@ | Out-File -FilePath stm-root-ca.pem -Encoding ascii
+
+          @"
+          ${{ secrets.STM_ICA_CA_PEM }}
+          "@ | Out-File -FilePath stm-ica-ca.pem -Encoding ascii
+
+          @"
+          ${{ secrets.STM_LEAF_CA_PEM }}
+          "@ | Out-File -FilePath stm-leaf-ca.pem -Encoding ascii
+
+      # Optionally inspect certs if OpenSSL is available on the Windows runner.
+      - name: Inspect STM CA PEM files
+        shell: pwsh
+        run: |
           openssl x509 -in stm-root-ca.pem -noout -subject -issuer -fingerprint -sha256
           openssl x509 -in stm-ica-ca.pem -noout -subject -issuer -fingerprint -sha256
           openssl x509 -in stm-leaf-ca.pem -noout -subject -issuer -fingerprint -sha256
-      - name: Build STM CA bundle
-        run: |
-          cat stm-root-ca.pem stm-ica-ca.pem stm-leaf-ca.pem > stm-ca-bundle.pem
-      - name: Inspect STM CA PEM files
-        # DEBUG
-        if: ${{ env.DEBUG == 'true' }}
-        run: |
-          echo "=== Root CA ==="
-          openssl x509 -in stm-root-ca.pem -noout -subject -issuer -serial -fingerprint -sha256
 
-          echo "=== ICA CA ==="
-          openssl x509 -in stm-ica-ca.pem -noout -subject -issuer -serial -fingerprint -sha256
+      # Windows-native verification path.
       - name: Verify signed EXE
+        shell: pwsh
         run: |
-          osslsigncode verify \
-            -CAfile stm-ca-bundle.pem \
-            -in simpleapp.exe
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+          Get-AuthenticodeSignature -FilePath "${{ github.workspace }}\simpleapp.exe" | Format-List *
+
+      - name: Show job status
+        shell: pwsh
+        run: |
+          Write-Host "This job's status is ${{ job.status }}."
