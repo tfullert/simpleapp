@@ -56,7 +56,7 @@ jobs:
       - name: Setup SM_CLIENT_CERT_FILE from base64 secret data
         run: |
           export SM_CLIENT_CERT_FILE=${RUNNER_TEMP}/sm_client_cert.p12
-          echo "${{ secrets.SM_CLIENT_CERT_FILE_B64_RESTRICT }}" | base64 --decode > ${SM_CLIENT_CERT_FILE}
+          echo "${{ secrets.SM_CLIENT_CERT_FILE_DEV_B64 }}" | base64 --decode > ${SM_CLIENT_CERT_FILE}
           echo "SM_CLIENT_CERT_FILE=${SM_CLIENT_CERT_FILE}" >> "$GITHUB_ENV"
         shell: bash
       - name: Verify SM client certificate file
@@ -71,7 +71,7 @@ jobs:
           -in "$SM_CLIENT_CERT_FILE" \
           -info \
           -noout \
-          -passin pass:"${{ secrets.SM_CLIENT_CERT_PASSWORD_RESTRICT }}"
+          -passin pass:"${{ secrets.SM_CLIENT_CERT_PASSWORD_DEV }}"
       - name: Inspect client auth certificate metadata
         # DEBUG
         if: ${{ env.DEBUG == 'true' }}
@@ -81,7 +81,7 @@ jobs:
           -in "$SM_CLIENT_CERT_FILE" \
           -clcerts \
           -nokeys \
-          -passin pass:"${{ secrets.SM_CLIENT_CERT_PASSWORD_RESTRICT }}" \
+          -passin pass:"${{ secrets.SM_CLIENT_CERT_PASSWORD_DEV }}" \
           | openssl x509 -noout -subject -issuer -dates -ext extendedKeyUsage
       - name: Sign simpleapp.exe with Software Trust Manager
         # It's easy to add STM signing to your current GHA workflow
@@ -89,12 +89,12 @@ jobs:
         with:
           simple-signing-mode: true
           input: simpleapp.exe
-          keypair-alias: SA_ECDSA_PROD_KP
+          keypair-alias: HS_ECDSA384_KP
         env:
           SM_HOST: ${{ vars.SM_HOST }}
-          SM_API_KEY: ${{ secrets.SM_API_KEY_RESTRICT }}
+          SM_API_KEY: ${{ secrets.SM_API_KEY_DEV }}
           SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
-          SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD_RESTRICT }}
+          SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD_DEV }}
       - name: Install signature verification tool and build cert store
         run: |
           sudo apt-get update
