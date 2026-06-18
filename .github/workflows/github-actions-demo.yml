@@ -81,7 +81,7 @@ jobs:
           SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
           SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD_DEV }}
         run: |
-          $releaseName = "HS_Project_Release_${{ github.run_number }}"
+          $releaseName = "HS_Project_GHAR_${{ github.run_number }}"
           
           $startTime = Get-Date -Format "dd-MMMM-yyyyTHH:mm"
           Write-Host $startTime
