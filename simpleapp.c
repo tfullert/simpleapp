@@ -14,6 +14,7 @@
 //           echo "SM_CLIENT_CERT_FILE=${SM_CLIENT_CERT_FILE}" >> "$GITHUB_ENV"
 
 // Let's trigger a GHA Workflow.
+
 int main() {
     // Say "Hello" to the world!
     printf("Hello, World!\n");
