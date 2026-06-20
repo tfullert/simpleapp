@@ -53,7 +53,7 @@ jobs:
           Write-Host "SM_CLIENT_CERT_FILE=$certPath"
           
       # =====================================================================================
-      # We're using protected (offline) keypairs that require a release window to use.
+      # Install STM smctl tool on GHA Runner.
       # =====================================================================================
       - name: Install STM client tools
         uses: digicert/code-signing-software-trust-action@v1.2.0
