@@ -47,7 +47,7 @@ jobs:
           $certPath = Join-Path $env:RUNNER_TEMP "sm_client_cert.p12"
           [System.IO.File]::WriteAllBytes(
             $certPath,
-            [System.Convert]::FromBase64String("${{ secrets.SM_CLIENT_CERT_FILE_DEV_B64 }}")
+            [System.Convert]::FromBase64String("${{ secrets.SM_CLIENT_CERT_FILE_B64_RESTRICT }}")
           )
           "SM_CLIENT_CERT_FILE=$certPath" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
           Write-Host "SM_CLIENT_CERT_FILE=$certPath"
@@ -88,16 +88,22 @@ jobs:
         shell: pwsh
         run: |
           @"
-          ${{ secrets.STM_ROOT_CA_PEM }}
+          ${{ secrets.STM_ROOT_TEST_CA_PEM }}
           "@ | Out-File -FilePath stm-root-ca.pem -Encoding ascii
 
           @"
-          ${{ secrets.STM_ICA_CA_PEM }}
+          ${{ secrets.STM_ICA_TEST_CA_PEM }}
           "@ | Out-File -FilePath stm-ica-ca.pem -Encoding ascii
 
           @"
-          ${{ secrets.STM_LEAF_CA_PEM }}
+          ${{ secrets.STM_LEAF_TEST_CA_PEM }}
           "@ | Out-File -FilePath stm-leaf-ca.pem -Encoding ascii
+
+          # Trust the root CA
+          certutil -addstore -f Root stm-root-ca.pem
+
+          # Add the intermediate CA
+          certutil -addstore -f CA stm-ica-ca.pem
 
       - name: Inspect STM CA PEM files
         shell: pwsh
