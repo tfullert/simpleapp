@@ -52,6 +52,9 @@ jobs:
           "SM_CLIENT_CERT_FILE=$certPath" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
           Write-Host "SM_CLIENT_CERT_FILE=$certPath"
 
+      # =====================================================================================
+      # Install STM tools for use by CI/CD pipeline.
+      # =====================================================================================
       - name: Install STM client tools
         uses: digicert/code-signing-software-trust-action@v1.2.0
         env:
@@ -112,6 +115,9 @@ jobs:
           openssl x509 -in stm-ica-ca.pem -noout -subject -issuer -fingerprint -sha256
           openssl x509 -in stm-leaf-ca.pem -noout -subject -issuer -fingerprint -sha256
 
+      # =====================================================================================
+      # Verify the signatures.
+      # =====================================================================================
       - name: Verify signed EXE
         shell: pwsh
         run: |
