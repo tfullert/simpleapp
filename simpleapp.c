@@ -13,7 +13,7 @@
 // NOTE: Each GitHub Actions step runs in its own process/shell so you need to export the SM_CLIENT_CERT_FILE value to be used on other steps:
 //           echo "SM_CLIENT_CERT_FILE=${SM_CLIENT_CERT_FILE}" >> "$GITHUB_ENV"
 
-// Let's trigger a GHA Workflow!!!!
+// Let's trigger a GHA Workflow!!!! Updating dev branch.
 
 int main() {
     // Say "Hello" to the world!
