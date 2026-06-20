@@ -1,6 +1,6 @@
 name: GitHub Actions Demo
 
-run-name: ${{ github.actor }} deploying and signing simpleapp.exe
+run-name: ${{ github.actor }} deploying and signing simpleapp.exe (TEST)
 
 on:
   push:
