@@ -1,0 +1,117 @@
+name: GitHub Actions Demo
+
+run-name: ${{ github.actor }} deploying and signing simpleapp.exe
+
+on:
+  push:
+    branches:
+      - dev
+
+permissions:
+  contents: write
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: windows-latest
+
+    steps:
+      - name: Show workflow context
+        shell: pwsh
+        run: |
+          Write-Host "The job was automatically triggered by a $env:GITHUB_EVENT_NAME event."
+          Write-Host "This job is now running on a $env:RUNNER_OS server hosted by GitHub."
+          Write-Host "The name of your branch is $env:GITHUB_REF and your repository is $env:GITHUB_REPOSITORY."
+
+      - name: Check out repository code
+        uses: actions/checkout@v6
+
+      - name: List files in the repository
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path "${{ github.workspace }}" -Recurse
+
+      - name: Set up MSVC developer command prompt
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Build Windows test executable
+        shell: cmd
+        run: |
+          cl simpleapp.c /Fe:simpleapp.exe
+
+      - name: Setup SM_CLIENT_CERT_FILE from base64 secret data
+        shell: pwsh
+        run: |
+          $certPath = Join-Path $env:RUNNER_TEMP "sm_client_cert.p12"
+          [System.IO.File]::WriteAllBytes(
+            $certPath,
+            [System.Convert]::FromBase64String("${{ secrets.SM_CLIENT_CERT_FILE_DEV_B64 }}")
+          )
+          "SM_CLIENT_CERT_FILE=$certPath" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          Write-Host "SM_CLIENT_CERT_FILE=$certPath"
+
+      - name: Install STM client tools
+        uses: digicert/code-signing-software-trust-action@v1.2.0
+        env:
+          SM_HOST: ${{ vars.SM_HOST }}
+          SM_API_KEY: ${{ secrets.SM_API_KEY_RESTRICT }}
+          SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
+          SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD_RESTRICT }}
+
+      - name: Confirm SMCTL is available
+        shell: pwsh
+        env:
+          SM_HOST: ${{ vars.SM_HOST }}
+          SM_API_KEY: ${{ secrets.SM_API_KEY_RESTRICT }}
+          SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
+          SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD_RESTRICT }}
+        run: |
+          smctl --help
+          smctl healthcheck
+
+      # =====================================================================================
+      # STM will sign our executable.
+      # =====================================================================================
+      - name: Sign simpleapp.exe with Software Trust Manager
+        shell: pwsh
+        env:
+          SM_HOST: ${{ vars.SM_HOST }}
+          SM_API_KEY: ${{ secrets.SM_API_KEY_RESTRICT }}
+          SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
+          SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD_RESTRICT }}
+        run: |
+          smctl sign --keypair-alias LS_ECDSA_KP --input "${{ github.workspace }}\simpleapp.exe"
+
+      - name: Write STM CA certificates
+        shell: pwsh
+        run: |
+          @"
+          ${{ secrets.STM_ROOT_CA_PEM }}
+          "@ | Out-File -FilePath stm-root-ca.pem -Encoding ascii
+
+          @"
+          ${{ secrets.STM_ICA_CA_PEM }}
+          "@ | Out-File -FilePath stm-ica-ca.pem -Encoding ascii
+
+          @"
+          ${{ secrets.STM_LEAF_CA_PEM }}
+          "@ | Out-File -FilePath stm-leaf-ca.pem -Encoding ascii
+
+      - name: Inspect STM CA PEM files
+        shell: pwsh
+        run: |
+          openssl x509 -in stm-root-ca.pem -noout -subject -issuer -fingerprint -sha256
+          openssl x509 -in stm-ica-ca.pem -noout -subject -issuer -fingerprint -sha256
+          openssl x509 -in stm-leaf-ca.pem -noout -subject -issuer -fingerprint -sha256
+
+      - name: Verify signed EXE
+        shell: pwsh
+        run: |
+          Get-AuthenticodeSignature -FilePath "${{ github.workspace }}\simpleapp.exe" | Format-List *
+
+      - name: Show job status
+        shell: pwsh
+        run: |
+          Write-Host "This job's status is ${{ job.status }}."
