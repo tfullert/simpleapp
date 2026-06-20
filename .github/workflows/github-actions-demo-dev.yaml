@@ -96,7 +96,7 @@ jobs:
           "@ | Out-File -FilePath stm-ica-ca.pem -Encoding ascii
 
           @"
-          ${{ secrets.STM_LEAF_CA_PEM }}
+          ${{ secrets.STM_LEAF_TEST_CA_PEM }}
           "@ | Out-File -FilePath stm-leaf-ca.pem -Encoding ascii
 
       - name: Inspect STM CA PEM files
