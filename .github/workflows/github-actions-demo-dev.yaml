@@ -56,69 +56,20 @@ jobs:
         uses: digicert/code-signing-software-trust-action@v1.2.0
         env:
           SM_HOST: ${{ vars.SM_HOST }}
-          SM_API_KEY: ${{ secrets.SM_API_KEY_DEV }}
+          SM_API_KEY: ${{ secrets.SM_API_KEY_RESTRICT }}
           SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
-          SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD_DEV }}
+          SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD_RESTRICT }}
 
       - name: Confirm SMCTL is available
         shell: pwsh
         env:
           SM_HOST: ${{ vars.SM_HOST }}
-          SM_API_KEY: ${{ secrets.SM_API_KEY_DEV }}
+          SM_API_KEY: ${{ secrets.SM_API_KEY_RESTRICT }}
           SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
-          SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD_DEV }}
+          SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD_RESTRICT }}
         run: |
           smctl --help
           smctl healthcheck
-
-      # =====================================================================================
-      # We're using protected (offline) keypairs that require a release window to use.
-      # =====================================================================================
-      - name: Create offline release
-        shell: pwsh
-        env:
-          SM_HOST: ${{ vars.SM_HOST }}
-          SM_API_KEY: ${{ secrets.SM_API_KEY_DEV }}
-          SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
-          SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD_DEV }}
-        run: |
-          $releaseName = "HS_Project_GHAR_${{ github.run_number }}"
-          
-          $startTime = Get-Date -Format "dd-MMMM-yyyyTHH:mm"
-          Write-Host $startTime
-
-          $endTime = (Get-Date).AddMinutes(15).ToString("dd-MMMM-yyyyTHH:mm")
-          Write-Host $endTime
-          
-          $output = & smctl release create offline $releaseName `
-            $startTime `
-            $endTime `
-            3b7597da-f7fc-42d8-a094-fd8c4b1197c4 `
-            --project HS_Project `
-            --team-id e75fe41c-b620-4f43-b344-3e91fc1cdb8d `
-            --purpose SIGN `
-            --maxsignatures 10 `
-            --keypair-type STANDARD `
-            --release-users ba928ed4-2e3f-42af-9ac0-f2a0893f75f8 `
-             2>&1
-
-            $outputText = $output | Out-String
-            Write-Host "SMCTL output:"
-            Write-Host $outputText
-
-            $releaseIdMatch = [regex]::Match($outputText, '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}')
-
-            if (-not $releaseIdMatch.Success) {
-              throw "Could not find release ID in smctl release create output."
-            }
-
-            $releaseId = $releaseIdMatch.Value
-
-            "RELEASE_ID=$releaseId" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
-            "RELEASE_NAME=$releaseName" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
-
-            Write-Host "Created release: $releaseName"
-            Write-Host "Release ID: $releaseId"
 
       # =====================================================================================
       # STM will sign our executable.
@@ -127,11 +78,11 @@ jobs:
         shell: pwsh
         env:
           SM_HOST: ${{ vars.SM_HOST }}
-          SM_API_KEY: ${{ secrets.SM_API_KEY_DEV }}
+          SM_API_KEY: ${{ secrets.SM_API_KEY_RESTRICT }}
           SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
-          SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD_DEV }}
+          SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD_RESTRICT }}
         run: |
-          smctl sign --keypair-alias HS_ECDSA384_KP --input "${{ github.workspace }}\simpleapp.exe"
+          smctl sign --keypair-alias LS_ECDSA_KP --input "${{ github.workspace }}\simpleapp.exe"
 
       - name: Write STM CA certificates
         shell: pwsh
@@ -160,25 +111,6 @@ jobs:
         run: |
           Get-AuthenticodeSignature -FilePath "${{ github.workspace }}\simpleapp.exe" | Format-List *
 
-      # =====================================================================================
-      # Now we can close our release window.
-      # =====================================================================================
-      - name: Close STM release
-        if: always()
-        shell: pwsh
-        env:
-          SM_HOST: ${{ vars.SM_HOST }}
-          SM_API_KEY: ${{ secrets.SM_API_KEY_DEV }}
-          SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
-          SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD_DEV }}
-        run: |
-          if (-not $env:RELEASE_ID) {
-            Write-Host "No RELEASE_ID found. Skipping release close."
-            exit 0
-          }
-
-          smctl release close $env:RELEASE_ID
-          Write-Host "Closed release: $env:RELEASE_ID"
       - name: Show job status
         shell: pwsh
         run: |
