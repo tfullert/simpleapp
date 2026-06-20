@@ -47,7 +47,7 @@ jobs:
           $certPath = Join-Path $env:RUNNER_TEMP "sm_client_cert.p12"
           [System.IO.File]::WriteAllBytes(
             $certPath,
-            [System.Convert]::FromBase64String("${{ secrets.SM_CLIENT_CERT_FILE_DEV_B64 }}")
+            [System.Convert]::FromBase64String("${{ secrets.SM_CLIENT_CERT_FILE_B64_RESTRICT }}")
           )
           "SM_CLIENT_CERT_FILE=$certPath" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
           Write-Host "SM_CLIENT_CERT_FILE=$certPath"
