@@ -88,11 +88,11 @@ jobs:
         shell: pwsh
         run: |
           @"
-          ${{ secrets.STM_ROOT_CA_PEM }}
+          ${{ secrets.STM_ROOT_TEST_CA_PEM }}
           "@ | Out-File -FilePath stm-root-ca.pem -Encoding ascii
 
           @"
-          ${{ secrets.STM_ICA_CA_PEM }}
+          ${{ secrets.STM_ICA_TEST_CA_PEM }}
           "@ | Out-File -FilePath stm-ica-ca.pem -Encoding ascii
 
           @"
