@@ -148,6 +148,12 @@ jobs:
           ${{ secrets.STM_LEAF_CA_PEM }}
           "@ | Out-File -FilePath stm-leaf-ca.pem -Encoding ascii
 
+          # Trust the root CA
+          certutil -addstore -f Root stm-root-ca.pem
+
+          # Add the intermediate CA
+          certutil -addstore -f CA stm-ica-ca.pem
+
       - name: Inspect STM CA PEM files
         shell: pwsh
         run: |
