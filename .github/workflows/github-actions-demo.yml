@@ -134,7 +134,7 @@ jobs:
           SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
           SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD_DEV }}
         run: |
-          smctl sign --keypair-alias HS_ECDSA384_KP --input "${{ github.workspace }}\simpleapp.exe"
+          smctl sign --keypair-alias HS_ECDSA_P384_KP --input "${{ github.workspace }}\simpleapp.exe"
 
       - name: Write STM CA certificates
         shell: pwsh
