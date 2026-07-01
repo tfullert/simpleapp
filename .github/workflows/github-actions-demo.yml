@@ -96,7 +96,7 @@ jobs:
           $output = & smctl release create offline $releaseName `
             $startTime `
             $endTime `
-            3b7597da-f7fc-42d8-a094-fd8c4b1197c4 `
+            f4b7b3a6-1e6a-4cfb-a167-44827886d874 `
             --project HS_Project `
             --team-id e75fe41c-b620-4f43-b344-3e91fc1cdb8d `
             --purpose SIGN `
