@@ -1,7 +1,7 @@
 #include <stdio.h>
 //#include <zlib.h>
 
-// This code will be updated to trigger Actions
+// This code will be updated to trigger Actions!
 
 // NOTE: I needed to change RUNNER_TEMP_DIR to RUNNER_TEMP and I also needed to run a PowerShell command to base64 encode the .p12 file:
 // [Convert]::ToBase64String([IO.File]::ReadAllBytes("C:\path_to_file\Certificate_pkcs12.p12")) | Set-Content -NoNewline -Encoding ascii "C:\path_to_file\Certificate_pkcs12.p12.b64"
